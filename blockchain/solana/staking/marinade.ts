@@ -17,7 +17,7 @@ import {
 	StakingConfig,
 	StakingProvider,
 } from ".";
-import { round2Decimals } from "../../../utils/numbers";
+import { round2Decimals } from "../../../numbers";
 import { getATAForAddress } from "../accounts";
 import { getTransactionsForAddress } from "../transactions";
 import { sendTransaction } from "../transactions/helpers";

@@ -15,6 +15,7 @@
 		"@medardm/react-native-bip39": "^3.0.2",
 		"@coral-xyz/anchor": "^0.26.0",
 		"@lidofinance/solido-sdk": "^0.8.1",
+		"@marinade.finance/marinade-ts-sdk": "^4.0.6",
 		"@dreson4/react-native-quick-bip39": "^0.0.5",
 		"@bonfida/spl-name-service": "^1.6.0",
 		"@symmetry-hq/funds-sdk": "^0.1.63",
