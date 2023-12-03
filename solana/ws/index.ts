@@ -1,7 +1,7 @@
 import { PublicKey } from "@metaplex-foundation/js";
 import { AccountLayout } from "@solana/spl-token";
 import { AccountInfo, Context } from "@solana/web3.js";
-import { logException } from "../../common/logging";
+import { logException } from "../../logging";
 import { getConnection } from "../connection";
 
 const meta = {

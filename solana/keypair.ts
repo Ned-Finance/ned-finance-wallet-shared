@@ -3,8 +3,8 @@ import * as ed from "@noble/ed25519";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import { decodeUTF8 } from "tweetnacl-util";
-import { logDebug } from "../common/logging";
 import { NED_FINANCE_SIGN_MESSAGE } from "../constants";
+import { logDebug } from "../logging";
 
 const meta = {
 	file: "utils/solana/keypair.ts",

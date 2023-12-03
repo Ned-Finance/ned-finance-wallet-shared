@@ -9,8 +9,8 @@ import {
 } from "@solana/web3.js";
 import axios from "axios";
 import _ from "lodash";
-import { logDebug, logException, logInfo } from "../../common/logging";
-import { NedConfigBlock, PRODUCTION } from "../../config";
+import { NedConfigBlock, PRODUCTION } from "../../../utils/config";
+import { logDebug, logException, logInfo } from "../../logging";
 import solana from "../constants";
 import { Token } from "../tokens";
 import { list } from "./devTokensList";

@@ -1,6 +1,6 @@
 import axios from "axios";
+import { getCurrency } from "../../utils/persistance/currency";
 import { API_URL } from "../constants";
-import { getCurrency } from "../persistance/currency";
 import { CurrencyPriceVsUsdResponse } from "./types";
 
 export const getCurrencyPriceVsUsd = async () => {

@@ -2,7 +2,7 @@ import {
 	SolanaNFTCollection,
 	SolanaNFTCollectionItem,
 	SolanaNFTCollectionStats,
-} from "../../solana/nfts";
+} from "../solana/nfts";
 
 export type NFTCollectionBase = {
 	name: string;

@@ -3,7 +3,7 @@ import {
 	NFTCollectionBase,
 	NFTCollectionItemBase,
 	NFTCollectionStatsBase,
-} from "../../common/nfts/types";
+} from "../../nfts/types";
 
 export type NFTCompression = {
 	eligible: boolean;

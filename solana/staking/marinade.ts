@@ -17,7 +17,7 @@ import {
 	StakingConfig,
 	StakingProvider,
 } from ".";
-import { round2Decimals } from "../../numbers";
+import { round2Decimals } from "../../../utils/numbers";
 import { getATAForAddress } from "../accounts";
 import { getTransactionsForAddress } from "../transactions";
 import { sendTransaction } from "../transactions/helpers";
@@ -46,11 +46,13 @@ export class MarinadeStaking implements StakingProvider {
 			amount: StakeAmount
 		) => Promise<MarinadeResult.Deposit | MarinadeResult.LiquidUnstake>
 	): Promise<TransactionSignature> {
-		const { associatedMSolTokenAccountAddress, transaction } =
-			await method(amount);
+		const { associatedMSolTokenAccountAddress, transaction } = await method(
+			amount
+		);
 
-		const latestBlockhash =
-			await this._config.connection.getLatestBlockhash("finalized");
+		const latestBlockhash = await this._config.connection.getLatestBlockhash(
+			"finalized"
+		);
 
 		const messageV0 = new TransactionMessage({
 			payerKey: this._config.keypair.publicKey,

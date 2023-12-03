@@ -1,4 +1,9 @@
-import { avalancheIcon, ethereumIcon, polygonIcon, solanaIcon } from "../icons";
+import {
+	avalancheIcon,
+	ethereumIcon,
+	polygonIcon,
+	solanaIcon,
+} from "../../utils/icons";
 
 export enum Network {
 	Ethereum = "ethereum",

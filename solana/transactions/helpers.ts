@@ -322,8 +322,9 @@ export const mergeTransactions = async (
 			async (resolve, reject) => {
 				const instructionsUnflatted = await Promise.all(
 					transactionlist.map(async (transaction: VersionedTransaction) => {
-						const addressLookupTableAccounts =
-							await getLookupTableAccounts(transaction);
+						const addressLookupTableAccounts = await getLookupTableAccounts(
+							transaction
+						);
 						return TransactionMessage.decompile(transaction.message, {
 							addressLookupTableAccounts,
 						}).instructions;
@@ -363,8 +364,9 @@ export const mergeTransactions = async (
 		mainTransaction,
 	]);
 
-	const restAddressLookupTableAccounts =
-		await getAddressLookupTableAccounts(transactions);
+	const restAddressLookupTableAccounts = await getAddressLookupTableAccounts(
+		transactions
+	);
 
 	const addressLookupTableAccounts = mainAddressLookupTableAccounts.concat(
 		restAddressLookupTableAccounts

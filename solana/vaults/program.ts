@@ -16,9 +16,9 @@ import {
 import _ from "lodash";
 import * as shortuuid from "short-uuid";
 import { match } from "ts-pattern";
-import { appLogger, logDebug, logInfo } from "../../common/logging";
-import { SolanaConfig } from "../../config";
-import { roundToNDecimals } from "../../numbers";
+import { SolanaConfig } from "../../../utils/config";
+import { roundToNDecimals } from "../../../utils/numbers";
+import { appLogger, logDebug, logInfo } from "../../logging";
 import {
 	createAtaTxIfDoesntExist,
 	getATAForAddress,
@@ -789,8 +789,9 @@ export class VaultsManager {
 
 		const fundTx = await this.fundWithDiffBalanceTx(vault, userTokenAccount);
 
-		const provideLiquidityTx =
-			await this.provideLiquidityWithDiffBalanceTx(vault);
+		const provideLiquidityTx = await this.provideLiquidityWithDiffBalanceTx(
+			vault
+		);
 
 		console.log("provideLiquidityTx", provideLiquidityTx);
 
@@ -1250,8 +1251,9 @@ export class VaultsManager {
 	}
 
 	async getTokenAPY(tokenAddress: string) {
-		const meteoraVaultInfo =
-			await this._meteoraManager.getMeteoraVaultInfo(tokenAddress);
+		const meteoraVaultInfo = await this._meteoraManager.getMeteoraVaultInfo(
+			tokenAddress
+		);
 		return meteoraVaultInfo?.average_apy;
 	}
 

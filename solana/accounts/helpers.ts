@@ -22,8 +22,8 @@ import {
 	VersionedTransaction,
 } from "@solana/web3.js";
 import _ from "lodash";
+import { roundToNDecimals } from "../../../utils/numbers";
 import { Cache } from "../../cache";
-import { roundToNDecimals } from "../../numbers";
 import { WalletAccount } from "../../types/wallet";
 import { getConnection } from "../connection";
 import constants from "../constants";

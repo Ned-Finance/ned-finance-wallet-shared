@@ -13,7 +13,7 @@ import {
 	StakingConfig,
 	StakingProvider,
 } from ".";
-import { round2Decimals } from "../../numbers";
+import { round2Decimals } from "../../../utils/numbers";
 import { sendTransaction } from "../transactions/helpers";
 
 type LidoInitConfig = Readonly<
@@ -49,8 +49,9 @@ export class LidoStaking implements StakingProvider {
 	): Promise<TransactionSignature> {
 		const { transaction } = await method(amount);
 
-		const latestBlockhash =
-			await this._config.connection.getLatestBlockhash("finalized");
+		const latestBlockhash = await this._config.connection.getLatestBlockhash(
+			"finalized"
+		);
 
 		const messageV0 = new TransactionMessage({
 			payerKey: this._config.keypair.publicKey,
