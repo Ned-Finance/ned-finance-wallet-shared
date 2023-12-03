@@ -1,5 +1,5 @@
 import { P, match } from "ts-pattern";
-import { solanaIcon } from "../../utils/icons";
+import { solanaIcon } from "../icons";
 import { Network } from "../networks";
 
 export const getNetworkIcon = (network: Network) => {
