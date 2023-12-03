@@ -1,0 +1,1 @@
+export const PRISM_AGGREATOR = 'AGGZ2djPDEvrbgiBTV3P8UoB8Zf1kGawkWd2eu553o44'
