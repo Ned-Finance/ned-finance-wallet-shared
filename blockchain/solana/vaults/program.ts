@@ -16,9 +16,9 @@ import {
 import _ from "lodash";
 import * as shortuuid from "short-uuid";
 import { match } from "ts-pattern";
-import { SolanaConfig } from "../../../utils/config";
-import { roundToNDecimals } from "../../../utils/numbers";
-import { appLogger, logDebug, logInfo } from "../../logging";
+import { SolanaConfig } from "../../../config";
+import { appLogger, logDebug, logInfo } from "../../../logging";
+import { roundToNDecimals } from "../../../numbers";
 import {
 	createAtaTxIfDoesntExist,
 	getATAForAddress,

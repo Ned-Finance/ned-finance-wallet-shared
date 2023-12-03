@@ -1,6 +1,6 @@
 import { Keypair } from "@solana/web3.js";
 import axios from "axios";
-import { API_URL } from "../../constants";
+import { API_URL } from "../../../constants";
 import { keyPairFromPrivateKey, privateKeyFromString } from "../keypair";
 import { GetWalletTokensWithPriceResponse } from "./types";
 

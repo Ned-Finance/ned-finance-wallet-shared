@@ -13,7 +13,7 @@ import {
 	StakingConfig,
 	StakingProvider,
 } from ".";
-import { round2Decimals } from "../../../utils/numbers";
+import { round2Decimals } from "../../../numbers";
 import { sendTransaction } from "../transactions/helpers";
 
 type LidoInitConfig = Readonly<

@@ -1,4 +1,3 @@
-import { Prism } from "@prism-hq/prism-ag";
 import {
 	Connection,
 	Keypair,
@@ -21,7 +20,6 @@ export class FundsManager {
 	private static instance: FundsManager;
 
 	private _funds!: FundsSDK;
-	private _prism!: Prism;
 	private _keypair!: Keypair;
 	private _connection!: Connection;
 

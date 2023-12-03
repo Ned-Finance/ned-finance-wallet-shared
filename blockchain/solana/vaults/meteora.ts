@@ -2,7 +2,7 @@ import { PublicKey } from "@metaplex-foundation/js";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { Connection, Keypair } from "@solana/web3.js";
 import axios from "axios";
-import { SolanaConfig } from "../../../utils/config";
+import { SolanaConfig } from "../../../config";
 import { SavingsManagerConfig } from "./program";
 
 type MeteoraVaultInfoStrategy = {

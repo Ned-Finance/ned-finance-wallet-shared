@@ -1,5 +1,5 @@
 import { Connection } from "@solana/web3.js";
-import { getConfig } from "../../utils/config";
+import { getConfig } from "../../config";
 
 const selectedConfig = getConfig();
 

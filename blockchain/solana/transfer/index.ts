@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { WalletAccount } from "../../types/wallet";
+import { WalletAccount } from "../../../types/wallet";
 import { JupiterManager } from "../jupiter";
 
 export const getTokenToTransferFromMint = (
