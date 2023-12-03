@@ -1,12 +1,12 @@
 import axios from "axios";
 import _ from "lodash";
-import { round2Decimals, roundToNDecimals } from "../../../utils/numbers";
-import { logException } from "../../logging";
-import { WalletAccount } from "../../types/wallet";
+import { logException } from "../../../logging";
+import { round2Decimals, roundToNDecimals } from "../../../numbers";
+import { WalletAccount } from "../../../types/wallet";
 import { SolanaTokenAccount } from "../accounts";
 
 const meta = {
-	file: "utils/solana/prices/index.ts",
+	file: "blockchain/solana/prices/index.ts",
 };
 
 export const getPriceFromAddresses = async (addresses: string[]) => {

@@ -1,4 +1,4 @@
-import { SolanaTokenAccount } from "../solana/accounts";
+import { SolanaTokenAccount } from "../blockchain/solana/accounts";
 
 export interface TokenPriceInfo {
 	price: number;

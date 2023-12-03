@@ -8,12 +8,12 @@ import {
 } from "@solana/web3.js";
 import _ from "lodash";
 import { ReadableParsedTransaction } from "ned-transactions-parser/dist/cjs/humanize/types";
-import { logDebug } from "../../logging";
+import { logDebug } from "../../../logging";
 import { getConnection } from "../connection";
 import { loadParsedTransactionsOptimized } from "./helpers";
 
 const meta = {
-	file: "utils/solana/transactions/index.ts",
+	file: "blockchain/solana/transactions/index.ts",
 };
 
 interface TransactionListResult {

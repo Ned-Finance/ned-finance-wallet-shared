@@ -1,6 +1,6 @@
 import { P, match } from "ts-pattern";
+import { getNftMetadataFromUri } from "../blockchain/solana/nfts/metadata";
 import { Network } from "../networks";
-import { getNftMetadataFromUri } from "../solana/nfts/metadata";
 
 export const getMetadata = (data: any, network: Network) => {
 	return match({ network })

@@ -1,9 +1,9 @@
 import { Keypair } from "@solana/web3.js";
 import _ from "lodash";
 import { match } from "ts-pattern";
+import { getKeypair } from "../blockchain/solana/wallet";
 import { logDebug } from "../logging";
 import { Network } from "../networks";
-import { getKeypair } from "../solana/wallet";
 import { Wallet } from "../types/wallet";
 
 const meta = {

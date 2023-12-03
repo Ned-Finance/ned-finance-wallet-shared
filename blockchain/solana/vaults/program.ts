@@ -98,7 +98,7 @@ export type VaultTransaction = {
 export class ProvideLiquidityError extends Error {}
 
 const meta = {
-	file: "utils/solana/vaults/program.ts",
+	file: "blockchain/solana/vaults/program.ts",
 };
 
 export class VaultsManager {

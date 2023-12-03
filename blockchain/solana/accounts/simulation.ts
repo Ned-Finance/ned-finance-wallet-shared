@@ -4,17 +4,17 @@ import {
 	SystemProgram,
 } from "@solana/web3.js";
 import _ from "lodash";
-import { roundToNDecimals } from "../../../utils/numbers";
-import { logDebug, logError } from "../../logging";
+import { logDebug, logError } from "../../../logging";
+import { roundToNDecimals } from "../../../numbers";
 import { getConnection } from "../connection";
 import { tokenFromMetaplex } from "../nfts/utils";
 import { Token } from "../tokens";
-import { TokenAccount } from "./helpers";
+import { SolanaTokenAccount } from "./helpers";
 
 const connection = getConnection();
 
 const meta = {
-	file: "utils/solana/accounts/simulation.ts",
+	file: "blockchain/solana/accounts/simulation.ts",
 };
 
 export const decodeAccountData = (data: Buffer): RawAccount | null => {
@@ -43,7 +43,7 @@ export type ChangedAccountResponse = {
 	isNFT: boolean;
 };
 export const getChangedAccounts = async (
-	accounts: TokenAccount[],
+	accounts: SolanaTokenAccount[],
 	modifiedAccounts: ChangedAccount[],
 	ownerAddress: string
 ): Promise<ChangedAccountResponse[]> => {
@@ -102,7 +102,7 @@ export const getChangedAccounts = async (
 						balance: 0,
 						balanceNonDecimal: "0",
 						isNFT: false,
-					} as TokenAccount;
+					} as SolanaTokenAccount;
 					const token = await tokenFromMetaplex(
 						connection,
 						current.decodedData!.mint.toBase58()

@@ -1,6 +1,6 @@
 import { Keypair as SolanaKeypair } from "@solana/web3.js";
+import { generateKeypair } from "../blockchain/solana/keypair";
 import { Network } from "../networks";
-import { generateKeypair } from "../solana/keypair";
 import { SolanaAccount } from "./accounts";
 import { Keypair } from "./keypair";
 

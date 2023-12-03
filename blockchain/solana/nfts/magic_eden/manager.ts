@@ -7,12 +7,15 @@ import {
 } from "@solana/web3.js";
 import axios from "axios";
 import * as _ from "lodash";
-import { NFTMetaplex, SolanaNFTCollectionItem } from "..";
-import { SolanaNFTCollectionStats } from "../../common/nfts/interfaces";
+import {
+	NFTMetaplex,
+	SolanaNFTCollectionItem,
+	SolanaNFTCollectionStats,
+} from "..";
 import {
 	default as constants,
 	default as solana,
-} from "../../solana/constants";
+} from "../../../solana/constants";
 import {
 	getOrCreateTokenAccount,
 	getTokenAccount,
