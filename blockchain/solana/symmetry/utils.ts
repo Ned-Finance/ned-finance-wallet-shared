@@ -1,6 +1,6 @@
 import axios from "axios";
 import BN from "bn.js";
-import { camelizeDeep } from "../../encoders";
+import { camelizeDeep } from "../../../encoders";
 import { FundCompositionToken, FundInfo, FundToken } from "./interfaces";
 
 export const parseAssetsPool = (
