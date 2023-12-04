@@ -5,6 +5,7 @@ import {
 	TOKEN_2022_PROGRAM_ID,
 	TOKEN_PROGRAM_ID,
 	createAssociatedTokenAccountInstruction,
+	createCloseAccountInstruction,
 	createSyncNativeInstruction,
 	getAccount,
 	getAssociatedTokenAddress,
@@ -597,4 +598,30 @@ export const getAccountAddress = async (
 		mainAddress
 	);
 	return SolanaTokenAccount.address.toBase58();
+};
+
+export const closeAccount = async (
+	account: string,
+	destination: string,
+	owner: string,
+	payer: Keypair
+) => {
+	const closeIx = createCloseAccountInstruction(
+		new PublicKey(account),
+		new PublicKey(destination),
+		new PublicKey(owner)
+	);
+
+	const latestBlockhash = await connection.getLatestBlockhash();
+
+	const messageV0 = new TransactionMessage({
+		payerKey: payer.publicKey,
+		recentBlockhash: latestBlockhash.blockhash,
+		instructions: [closeIx],
+	}).compileToV0Message();
+
+	const transaction = new VersionedTransaction(messageV0);
+	transaction.sign([payer]);
+
+	return transaction;
 };

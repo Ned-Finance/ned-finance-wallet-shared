@@ -20,7 +20,7 @@ import { SolanaConfig } from "../../../config";
 import { appLogger, logDebug, logException, logInfo } from "../../../logging";
 import { roundToNDecimals } from "../../../numbers";
 import {
-	createAtaAndFundTx,
+	closeAccount,
 	createAtaTxIfDoesntExist,
 	getATAForAddress,
 	getMintAccount,
@@ -67,6 +67,7 @@ export type Vault = {
 	symbol: string;
 	spare: number;
 	balance: number;
+	fullBalance: string;
 	identifier: string;
 	earningsEnabled: boolean;
 	earningsData?: VaultEarningsData;
@@ -440,6 +441,7 @@ export class VaultsManager {
 						resolve({
 							...vault,
 							balance: Number(account.amount),
+							fullBalance: account.amount,
 							tokenDecimals: mint.decimals,
 						});
 					});
@@ -517,7 +519,7 @@ export class VaultsManager {
 						} else {
 							return roundToNDecimals(
 								vault.balance / Math.pow(10, vault.tokenDecimals),
-								2
+								4
 							);
 						}
 					};
@@ -894,21 +896,41 @@ export class VaultsManager {
 	}
 
 	async withdraw(
-		toAddress: string,
+		mainAddress: string,
 		vault: Vault,
-		amount: number,
-		isNative: boolean
+		amount: number
 	): Promise<WithdrawVaultSuccess | VaultError> {
 		await this.sync();
 
 		try {
-			const transactionTransfer = await this.withdrawTx(
-				toAddress,
-				vault,
-				amount
+			const toAddress = await getATAForAddress(vault.tokenAddress, mainAddress);
+
+			const { transaction: createAtaTx, ata } = await createAtaTxIfDoesntExist(
+				vault.tokenAddress,
+				mainAddress,
+				this._keypair
 			);
 
-			const tx = await sendTransaction(transactionTransfer);
+			const preTx = createAtaTx ? [createAtaTx] : [];
+
+			const withdrawTx = await this.withdrawTx(toAddress, vault, amount);
+
+			const closeAccountTx = await closeAccount(
+				toAddress,
+				mainAddress,
+				mainAddress,
+				this._keypair
+			);
+
+			const postTx = createAtaTx ? [closeAccountTx] : [];
+
+			const mergedTransaction = await mergeTransactions(
+				this._keypair.publicKey,
+				[...preTx, withdrawTx, ...postTx]
+			);
+			mergedTransaction.sign([this._keypair]);
+
+			const tx = await sendTransaction(mergedTransaction);
 
 			return { tx };
 		} catch (error) {
@@ -992,35 +1014,48 @@ export class VaultsManager {
 
 	async withdrawLiquidityAndWithdraw(
 		mainAddress: string,
-		toAddress: string,
 		vault: Vault,
-		amountInLpTokens: number,
-		amount: number,
-		isNative: boolean = false
+		amount: number
 	): Promise<WithdrawVaultSuccess | VaultError> {
 		try {
-			logInfo({
-				message: `Requesting withdraw (liquidity enabled) of ${amount}`,
-				meta,
-			});
-
 			await this.sync();
 			const amountWithDecimals = amount * Math.pow(10, vault.tokenDecimals);
 
-			const preTransactions = await createAtaAndFundTx(
-				mainAddress,
+			const toAddress = await getATAForAddress(vault.tokenAddress, mainAddress);
+
+			logInfo({
+				message: `Requesting withdraw (liquidity enabled) from vault ${JSON.stringify(
+					vault
+				)} amount: ${amount}, amount with decimals: ${amountWithDecimals}`,
+				meta,
+			});
+
+			const { transaction: createAtaTx, ata } = await createAtaTxIfDoesntExist(
 				vault.tokenAddress,
 				mainAddress,
-				amount,
 				this._keypair
+			);
+
+			const preTx = createAtaTx ? [createAtaTx] : [];
+
+			const closeAccountTx = await closeAccount(
+				toAddress,
+				mainAddress,
+				mainAddress,
+				this._keypair
+			);
+
+			const postTx = createAtaTx ? [closeAccountTx] : [];
+
+			const amountLpTokensFromVault = this.getAmountLpTokensFromVault(
+				amount,
+				vault
 			);
 
 			const withdrawLiquidityTx = await this.withdrawLiquidityTx(
 				vault,
-				amountInLpTokens
+				amountLpTokensFromVault
 			);
-
-			console.log("withdrawLiquidityTx", withdrawLiquidityTx, amountInLpTokens);
 
 			const withdrawTx = await this.withdrawTx(
 				toAddress,
@@ -1028,14 +1063,11 @@ export class VaultsManager {
 				amountWithDecimals
 			);
 
-			console.log("withdrawTx ===>", withdrawTx);
-
 			const mergedTransaction = await mergeTransactions(
 				this._keypair.publicKey,
-				[...preTransactions, withdrawLiquidityTx, withdrawTx]
+				[...preTx, withdrawLiquidityTx, withdrawTx, ...postTx]
 			);
 			mergedTransaction.sign([this._keypair]);
-			console.log("mergedTransaction", mergedTransaction);
 
 			const final = await sendTransaction(mergedTransaction);
 
@@ -1630,5 +1662,28 @@ export class VaultsManager {
 		} else {
 			return null;
 		}
+	}
+
+	getAmountLpTokensFromVault(amount: number, vault: Vault) {
+		const lpTokenDecimals = Math.pow(10, vault.earningsData!.lpTokenDecimals);
+
+		const amountLpWithDecimals = amount * lpTokenDecimals;
+
+		const realTokenValue =
+			amountLpWithDecimals * vault.earningsData!.virtualPrice;
+
+		console.log("realTokenValue", realTokenValue);
+
+		const realTokenValueRounded = roundToNDecimals(
+			realTokenValue,
+			vault.earningsData!.lpTokenDecimals
+		);
+
+		logInfo({
+			message: `Amount ${amount} in lp tokens for vault ${vault.accountAddress} = ${realTokenValueRounded} lp tokens`,
+			meta,
+		});
+
+		return realTokenValueRounded;
 	}
 }
