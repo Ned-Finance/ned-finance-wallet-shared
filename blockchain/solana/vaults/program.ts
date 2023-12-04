@@ -17,9 +17,10 @@ import _ from "lodash";
 import * as shortuuid from "short-uuid";
 import { match } from "ts-pattern";
 import { SolanaConfig } from "../../../config";
-import { appLogger, logDebug, logInfo } from "../../../logging";
+import { appLogger, logDebug, logException, logInfo } from "../../../logging";
 import { roundToNDecimals } from "../../../numbers";
 import {
+	createAtaAndFundTx,
 	createAtaTxIfDoesntExist,
 	getATAForAddress,
 	getMintAccount,
@@ -795,11 +796,10 @@ export class VaultsManager {
 
 		console.log("provideLiquidityTx", provideLiquidityTx);
 
-		const mergedTransaction = await mergeTransactions(
-			this._keypair.publicKey,
+		const mergedTransaction = await mergeTransactions(this._keypair.publicKey, [
 			fundTx,
-			[provideLiquidityTx]
-		);
+			provideLiquidityTx,
+		]);
 		mergedTransaction.sign([this._keypair]);
 		console.log("mergedTransaction", mergedTransaction);
 
@@ -821,11 +821,10 @@ export class VaultsManager {
 
 		console.log("provideLiquidityTx", provideLiquidityTx);
 
-		const mergedTransaction = await mergeTransactions(
-			this._keypair.publicKey,
+		const mergedTransaction = await mergeTransactions(this._keypair.publicKey, [
 			fundTx,
-			[provideLiquidityTx]
-		);
+			provideLiquidityTx,
+		]);
 		mergedTransaction.sign([this._keypair]);
 		console.log("mergedTransaction", mergedTransaction);
 
@@ -897,7 +896,8 @@ export class VaultsManager {
 	async withdraw(
 		toAddress: string,
 		vault: Vault,
-		amount: number
+		amount: number,
+		isNative: boolean
 	): Promise<WithdrawVaultSuccess | VaultError> {
 		await this.sync();
 
@@ -991,14 +991,29 @@ export class VaultsManager {
 	}
 
 	async withdrawLiquidityAndWithdraw(
+		mainAddress: string,
 		toAddress: string,
 		vault: Vault,
 		amountInLpTokens: number,
-		amount: number
+		amount: number,
+		isNative: boolean = false
 	): Promise<WithdrawVaultSuccess | VaultError> {
 		try {
+			logInfo({
+				message: `Requesting withdraw (liquidity enabled) of ${amount}`,
+				meta,
+			});
+
 			await this.sync();
 			const amountWithDecimals = amount * Math.pow(10, vault.tokenDecimals);
+
+			const preTransactions = await createAtaAndFundTx(
+				mainAddress,
+				vault.tokenAddress,
+				mainAddress,
+				amount,
+				this._keypair
+			);
 
 			const withdrawLiquidityTx = await this.withdrawLiquidityTx(
 				vault,
@@ -1013,12 +1028,11 @@ export class VaultsManager {
 				amountWithDecimals
 			);
 
-			console.log("withdrawTx", withdrawTx);
+			console.log("withdrawTx ===>", withdrawTx);
 
 			const mergedTransaction = await mergeTransactions(
 				this._keypair.publicKey,
-				withdrawLiquidityTx,
-				[withdrawTx]
+				[...preTransactions, withdrawLiquidityTx, withdrawTx]
 			);
 			mergedTransaction.sign([this._keypair]);
 			console.log("mergedTransaction", mergedTransaction);
@@ -1027,7 +1041,12 @@ export class VaultsManager {
 
 			return { tx: final };
 		} catch (error) {
-			console.log("error", error);
+			console.log("error ===>", error);
+			logException({
+				message: "Error sending withdraw with liquidity",
+				capturedError: error as Error,
+				meta,
+			});
 			const unknowErrorMessage = "Unexpected error. Code: E0";
 			return { error: true, message: unknowErrorMessage };
 		}
@@ -1067,8 +1086,7 @@ export class VaultsManager {
 
 			const mergedTransaction = await mergeTransactions(
 				this._keypair.publicKey,
-				updateVaultTx,
-				[provideLiquidityTx]
+				[updateVaultTx, provideLiquidityTx]
 			);
 			mergedTransaction.sign([this._keypair]);
 
@@ -1124,8 +1142,7 @@ export class VaultsManager {
 
 			const mergedTransaction = await mergeTransactions(
 				this._keypair.publicKey,
-				withdrawLiquidity,
-				[updateVaultTx]
+				[withdrawLiquidity, updateVaultTx]
 			);
 			mergedTransaction.sign([this._keypair]);
 
@@ -1523,10 +1540,9 @@ export class VaultsManager {
 			if (swapTx) {
 				const { transaction: createAtaTx, ata: userATA } =
 					await createAtaTxIfDoesntExist(
-						this._keypair.publicKey.toBase58(),
 						vault.tokenAddress,
-						this._keypair,
-						this._keypair.publicKey.toBase58()
+						this._keypair.publicKey.toBase58(),
+						this._keypair
 					);
 
 				const saveBalanceTx = await this.saveOnLedgerTx(
@@ -1556,7 +1572,8 @@ export class VaultsManager {
 
 				const vaultTx = await fn(vault, new PublicKey(userATA));
 
-				return await mergeTransactions(this._keypair.publicKey, firstTx, [
+				return await mergeTransactions(this._keypair.publicKey, [
+					firstTx,
 					...secondTx,
 					swapTx,
 					vaultTx,

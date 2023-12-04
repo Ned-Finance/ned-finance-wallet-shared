@@ -5,6 +5,7 @@ import {
 	TOKEN_2022_PROGRAM_ID,
 	TOKEN_PROGRAM_ID,
 	createAssociatedTokenAccountInstruction,
+	createSyncNativeInstruction,
 	getAccount,
 	getAssociatedTokenAddress,
 	getAssociatedTokenAddressSync,
@@ -18,6 +19,7 @@ import {
 	ParsedAccountData,
 	PublicKey,
 	SignaturesForAddressOptions,
+	SystemProgram,
 	TransactionMessage,
 	VersionedTransaction,
 } from "@solana/web3.js";
@@ -228,14 +230,38 @@ export const getATAForAddress = (
 	return ata.toBase58();
 };
 
-export const createAtaTxIfDoesntExist = async (
-	address: string,
-	mint: string,
-	payer: Keypair,
+export const createAtaAndFundTx = async (
+	mainAddress: string,
+	tokenAddress: string,
 	owner: string,
+	amount: number,
+	payer: Keypair
+): Promise<VersionedTransaction[]> => {
+	const { transaction: createAtaTx, ata } = await createAtaTxIfDoesntExist(
+		tokenAddress,
+		owner,
+		payer
+	);
+	if (createAtaTx) {
+		const sendSolTx = await sendSolToWrappedAccount(
+			mainAddress,
+			ata,
+			amount,
+			payer
+		);
+		return [createAtaTx, sendSolTx];
+	} else {
+		return [];
+	}
+};
+
+export const createAtaTxIfDoesntExist = async (
+	mint: string,
+	owner: string,
+	payer: Keypair,
 	allowOwnerOffCurve = false,
 	programId: string = TOKEN_PROGRAM_ID.toBase58()
-) => {
+): Promise<{ transaction: VersionedTransaction | null; ata: string }> => {
 	const userATA = await getATAForAddress(
 		mint,
 		owner,
@@ -266,6 +292,7 @@ export const createAtaTxIfDoesntExist = async (
 			newAtaMint,
 			new PublicKey(programId)
 		);
+
 		const latestBlockhash = await connection.getLatestBlockhash();
 
 		const messageV0 = new TransactionMessage({
@@ -279,6 +306,57 @@ export const createAtaTxIfDoesntExist = async (
 
 		return { transaction, ata: userATA };
 	}
+};
+
+export const sendSolToWrappedAccount = async (
+	mainAddress: string,
+	associatedTokenAccount: string,
+	amount: number,
+	payer: Keypair,
+	programId = TOKEN_PROGRAM_ID
+) => {
+	console.log("amount --------->", amount * LAMPORTS_PER_SOL);
+	// createTransferCheckedInstruction(
+	// 	new PublicKey(mainAddress),
+	// 	new PublicKey(mint),
+	// 	new PublicKey(toAddress),
+	// 	signer.publicKey,
+	// 	amount,
+	// 	decimals,
+	// 	[],
+	// 	new PublicKey(tokenProgramId)
+	// ),
+
+	// const transferIx = createTransferInstruction(
+	// 	new PublicKey(mainAddress),
+	// 	new PublicKey(associatedTokenAccount),
+	// 	new PublicKey(mainAddress),
+	// 	amount * LAMPORTS_PER_SOL,
+	// 	[],
+	// 	programId
+	// );
+
+	const transferIx = SystemProgram.transfer({
+		fromPubkey: new PublicKey(mainAddress),
+		toPubkey: new PublicKey(associatedTokenAccount),
+		lamports: amount * LAMPORTS_PER_SOL,
+	});
+
+	const latestBlockhash = await connection.getLatestBlockhash();
+
+	const messageV0 = new TransactionMessage({
+		payerKey: payer.publicKey,
+		recentBlockhash: latestBlockhash.blockhash,
+		instructions: [
+			transferIx,
+			createSyncNativeInstruction(new PublicKey(associatedTokenAccount)),
+		],
+	}).compileToV0Message();
+
+	const transaction = new VersionedTransaction(messageV0);
+	transaction.sign([payer]);
+
+	return transaction;
 };
 
 export const getSignaturesForAddress = async (

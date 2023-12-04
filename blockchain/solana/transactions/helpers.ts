@@ -255,7 +255,7 @@ export const getTokenAccount = async (tokenMint: string, address: string) => {
 export const sendTransaction = async (transaction: VersionedTransaction) => {
 	const connection = getConnection();
 	const tx = await connection.sendTransaction(transaction, {
-		skipPreflight: false,
+		skipPreflight: true,
 	});
 	return tx;
 };
@@ -307,69 +307,57 @@ export const getLookupTableAccounts = (transaction: VersionedTransaction) => {
 	);
 };
 
+export const getTransactionInstructions = async (
+	transactionlist: VersionedTransaction[]
+) => {
+	return await new Promise<TransactionInstruction[]>(
+		async (resolve, reject) => {
+			const instructionsUnflatted = await Promise.all(
+				transactionlist.map(async (transaction: VersionedTransaction) => {
+					const addressLookupTableAccounts = await getLookupTableAccounts(
+						transaction
+					);
+					return TransactionMessage.decompile(transaction.message, {
+						addressLookupTableAccounts,
+					}).instructions;
+				})
+			);
+
+			console.log("instructionsUnflatted", instructionsUnflatted);
+
+			const instructionsFlattern = _.flatten(instructionsUnflatted);
+
+			resolve(instructionsFlattern);
+		}
+	);
+};
+
+export const getAddressLookupTableAccounts = async (
+	transactionlist: VersionedTransaction[]
+) => {
+	return await new Promise<AddressLookupTableAccount[]>(
+		async (resolve, reject) => {
+			const lookupTables = await Promise.all(
+				transactionlist.flatMap(async (transaction: VersionedTransaction) => {
+					return await getLookupTableAccounts(transaction);
+				})
+			);
+			resolve(_.flatten(lookupTables));
+		}
+	);
+};
+
 export const mergeTransactions = async (
 	payerKey: PublicKey,
-	mainTransaction: VersionedTransaction,
 	transactions: VersionedTransaction[]
 ): Promise<VersionedTransaction> => {
-	console.log("mainTransaction----->", mainTransaction.message);
+	// console.log("mainTransaction----->", mainTransaction.message);
 	// const message = TransactionMessage.decompile(mainTransaction.message);
 
-	const getTransactionInstructions = async (
-		transactionlist: VersionedTransaction[]
-	) => {
-		return await new Promise<TransactionInstruction[]>(
-			async (resolve, reject) => {
-				const instructionsUnflatted = await Promise.all(
-					transactionlist.map(async (transaction: VersionedTransaction) => {
-						const addressLookupTableAccounts = await getLookupTableAccounts(
-							transaction
-						);
-						return TransactionMessage.decompile(transaction.message, {
-							addressLookupTableAccounts,
-						}).instructions;
-					})
-				);
+	const instructions = await getTransactionInstructions(transactions);
 
-				console.log("instructionsUnflatted", instructionsUnflatted);
-
-				const instructionsFlattern = _.flatten(instructionsUnflatted);
-
-				resolve(instructionsFlattern);
-			}
-		);
-	};
-
-	const mainInstructions = await getTransactionInstructions([mainTransaction]);
-	const restInstructions = await getTransactionInstructions(transactions);
-
-	const instructions = mainInstructions.concat(restInstructions);
-
-	const getAddressLookupTableAccounts = async (
-		transactionlist: VersionedTransaction[]
-	) => {
-		return await new Promise<AddressLookupTableAccount[]>(
-			async (resolve, reject) => {
-				const lookupTables = await Promise.all(
-					transactionlist.flatMap(async (transaction: VersionedTransaction) => {
-						return await getLookupTableAccounts(transaction);
-					})
-				);
-				resolve(_.flatten(lookupTables));
-			}
-		);
-	};
-
-	const mainAddressLookupTableAccounts = await getAddressLookupTableAccounts([
-		mainTransaction,
-	]);
-
-	const restAddressLookupTableAccounts = await getAddressLookupTableAccounts(
+	const addressLookupTableAccounts = await getAddressLookupTableAccounts(
 		transactions
-	);
-
-	const addressLookupTableAccounts = mainAddressLookupTableAccounts.concat(
-		restAddressLookupTableAccounts
 	);
 
 	const latestBlockhash = await getConnection().getLatestBlockhash();
