@@ -171,7 +171,7 @@ export const getParsedAccountsForAddress = async (
 	const nativeSOLAccount: SolanaTokenAccount = {
 		...constants.WRAPPED_SOL_TOKEN,
 		name: "SOL",
-		address: address,
+		address: "",
 		balance: balance / LAMPORTS_PER_SOL,
 		balanceNonDecimal: String(balance),
 		mint: constants.WRAPPED_SOL_TOKEN.address,
