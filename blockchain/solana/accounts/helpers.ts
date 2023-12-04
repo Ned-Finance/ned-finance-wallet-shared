@@ -231,7 +231,7 @@ export const getATAForAddress = (
 	return ata.toBase58();
 };
 
-export const createAtaAndFundTx = async (
+export const createAtaAndFundTxIfDoesntExist = async (
 	mainAddress: string,
 	tokenAddress: string,
 	owner: string,

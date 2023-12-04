@@ -21,6 +21,7 @@ import { appLogger, logDebug, logException, logInfo } from "../../../logging";
 import { roundToNDecimals } from "../../../numbers";
 import {
 	closeAccount,
+	createAtaAndFundTxIfDoesntExist,
 	createAtaTxIfDoesntExist,
 	getATAForAddress,
 	getMintAccount,
@@ -67,7 +68,7 @@ export type Vault = {
 	symbol: string;
 	spare: number;
 	balance: number;
-	fullBalance: string;
+	fullBalance: number;
 	identifier: string;
 	earningsEnabled: boolean;
 	earningsData?: VaultEarningsData;
@@ -441,7 +442,7 @@ export class VaultsManager {
 						resolve({
 							...vault,
 							balance: Number(account.amount),
-							fullBalance: account.amount,
+							fullBalance: Number(account.amount),
 							tokenDecimals: mint.decimals,
 						});
 					});
@@ -762,19 +763,48 @@ export class VaultsManager {
 	}
 
 	async fund(
-		fromAddress: string,
+		mainAddress: string,
 		vault: Vault,
 		amount: number
 	): Promise<FundVaultSuccess | VaultError> {
 		try {
+			const fromAddress = await getATAForAddress(
+				vault.tokenAddress,
+				mainAddress
+			);
+
 			const amountWithDecimals = amount * Math.pow(10, vault.tokenDecimals);
-			const transactionTransfer = await this.fundTx(
+
+			const preTx = await createAtaAndFundTxIfDoesntExist(
+				mainAddress,
+				vault.tokenAddress,
+				mainAddress,
+				amount,
+				this._keypair
+			);
+
+			const transferTx = await this.fundTx(
 				fromAddress,
 				vault,
 				amountWithDecimals
 			);
 
-			const tx = await sendTransaction(transactionTransfer);
+			const closeAccountTx = await closeAccount(
+				fromAddress,
+				mainAddress,
+				mainAddress,
+				this._keypair
+			);
+
+			const postTx = preTx.length ? [closeAccountTx] : [];
+
+			const mergedTransaction = await mergeTransactions(
+				this._keypair.publicKey,
+				[...preTx, transferTx, ...postTx]
+			);
+			mergedTransaction.sign([this._keypair]);
+
+			const tx = await sendTransaction(mergedTransaction);
 
 			return { tx };
 		} catch (error) {
@@ -834,21 +864,50 @@ export class VaultsManager {
 	}
 
 	async fundAndProvideLiquidity(
-		fromAddress: string,
+		mainAddress: string,
 		vault: Vault,
 		amount: number
 	): Promise<FundVaultSuccess | VaultError> {
 		try {
+			const fromAddress = await getATAForAddress(
+				vault.tokenAddress,
+				mainAddress
+			);
+
 			const amountWithDecimals = amount * Math.pow(10, vault.tokenDecimals);
-			const mergedTransaction = await this.fundAndProvideLiquidityTx(
+
+			const preTx = await createAtaAndFundTxIfDoesntExist(
+				mainAddress,
+				vault.tokenAddress,
+				mainAddress,
+				amount,
+				this._keypair
+			);
+
+			const fundTx = await this.fundAndProvideLiquidityTx(
 				fromAddress,
 				vault,
 				amountWithDecimals
 			);
 
-			const final = await sendTransaction(mergedTransaction);
+			const closeAccountTx = await closeAccount(
+				fromAddress,
+				mainAddress,
+				mainAddress,
+				this._keypair
+			);
 
-			return { tx: final };
+			const postTx = preTx.length ? [closeAccountTx] : [];
+
+			const mergedTransaction = await mergeTransactions(
+				this._keypair.publicKey,
+				[...preTx, fundTx, ...postTx]
+			);
+			mergedTransaction.sign([this._keypair]);
+
+			const tx = await sendTransaction(mergedTransaction);
+
+			return { tx };
 		} catch (error) {
 			console.log("error", error);
 			const unknowErrorMessage = "Unexpected error. Code: E0";
@@ -1069,9 +1128,9 @@ export class VaultsManager {
 			);
 			mergedTransaction.sign([this._keypair]);
 
-			const final = await sendTransaction(mergedTransaction);
+			const tx = await sendTransaction(mergedTransaction);
 
-			return { tx: final };
+			return { tx };
 		} catch (error) {
 			console.log("error ===>", error);
 			logException({
@@ -1122,9 +1181,9 @@ export class VaultsManager {
 			);
 			mergedTransaction.sign([this._keypair]);
 
-			const final = await sendTransaction(mergedTransaction);
+			const tx = await sendTransaction(mergedTransaction);
 
-			return { tx: final };
+			return { tx };
 		} catch (error) {
 			console.log("error", error);
 			const unknowErrorMessage = "Unexpected error. Code: E0";
@@ -1178,9 +1237,9 @@ export class VaultsManager {
 			);
 			mergedTransaction.sign([this._keypair]);
 
-			const final = await sendTransaction(mergedTransaction);
+			const tx = await sendTransaction(mergedTransaction);
 
-			return { tx: final };
+			return { tx };
 		} catch (error) {
 			console.log("error", error);
 			const unknowErrorMessage = "Unexpected error. Code: E0";
