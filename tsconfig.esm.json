@@ -1,10 +1,10 @@
 {
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
-		"lib": ["ES6", "dom"],
+		"lib": ["es6", "dom"],
 		"moduleResolution": "node",
 		"module": "es2022",
-		"target": "es2019",
+		"target": "es6",
 		"outDir": "lib/esm/",
 		"rootDir": "./src",
 		"declaration": false,

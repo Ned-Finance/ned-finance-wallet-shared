@@ -23,6 +23,7 @@ module.exports = {
 		"/lib/**/*", // Ignore built files.
 		"rollup.config.js",
 		"postinstall.js",
+		"shim.js",
 		"logging/**",
 		"icons/index.ts",
 		"encoders/index.ts",
