@@ -1,8 +1,3 @@
-import { Dimensions } from "react-native";
-
-export const sw = Dimensions.get("window").width;
-export const sh = Dimensions.get("window").height;
-
 export const getShortAddress = (address: string) => {
 	return `${address.slice(0, 4)}...${address.slice(
 		address.length - 4,
