@@ -60,9 +60,11 @@ export const getSimulation = async (
 		commitment: "finalized",
 	});
 	logDebug({
-		message: `Simulation with accounts ${accounts} for signatures ${
+		message: `Simulation with accounts ${JSON.stringify(
+			accounts
+		)} for signatures ${JSON.stringify(
 			transaction.signatures
-		} has responded with ${JSON.stringify(response)}`,
+		)} has responded with ${JSON.stringify(response)}`,
 		meta,
 	});
 	return response;
@@ -71,7 +73,8 @@ export const getSimulation = async (
 export const getTransactionsForAddress = async (
 	address: string,
 	walletAddress: string,
-	tokenList: any[],
+	getFn: (key: string) => Promise<string | null>,
+	saveFn: (key: string, value: string) => Promise<void>,
 	latestSignature?: TransactionSignature
 ): Promise<TransactionListResult> => {
 	const before = _.isEmpty(latestSignature) ? {} : { before: latestSignature };
@@ -90,7 +93,9 @@ export const getTransactionsForAddress = async (
 
 	const transactions = await loadParsedTransactionsOptimized(
 		walletAddress,
-		signatures
+		signatures,
+		getFn,
+		saveFn
 	);
 
 	console.log("transactions ==>", transactions);

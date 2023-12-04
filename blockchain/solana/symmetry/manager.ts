@@ -114,9 +114,8 @@ export class FundsManager {
 			usdcAmount
 		);
 		console.log("buyState", buyState);
-		let txs: TransactionSignature[] = await this._funds.rebalanceBuyState(
-			buyState
-		);
+		let txs: TransactionSignature[] =
+			await this._funds.rebalanceBuyState(buyState);
 		console.log("txs", txs);
 		let tx: TransactionSignature = await this._funds.mintFund(buyState);
 		console.log("tx", tx);
@@ -130,9 +129,8 @@ export class FundsManager {
 		console.log("buyStates", buyStates);
 		for (let index = 0; index < buyStates.length; index++) {
 			const buyState = buyStates[index];
-			let txs: TransactionSignature[] = await this._funds.rebalanceBuyState(
-				buyState
-			);
+			let txs: TransactionSignature[] =
+				await this._funds.rebalanceBuyState(buyState);
 			console.log("txs", txs);
 			let tx: TransactionSignature = await this._funds.mintFund(buyState);
 			console.log("tx", tx);

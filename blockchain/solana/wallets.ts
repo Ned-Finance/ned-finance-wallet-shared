@@ -21,7 +21,7 @@ import {
 import _ from "lodash";
 import { HDKey } from "micro-ed25519-hdkey";
 import { Observable } from "rxjs";
-import { ImportedWalletSolana, WalletFromMnemonic } from "../wallet";
+import { ImportedWalletSolana, WalletFromMnemonic } from "../../wallet";
 import { getConnection } from "./connection";
 import { privateKeyToString } from "./keypair";
 import { getTransactionsCountForAddress } from "./transactions";

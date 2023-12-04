@@ -15,6 +15,7 @@ export const subscribeToAccountUpdates = (
 	try {
 		return getConnection().onAccountChange(
 			new PublicKey(address),
+			/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 			(accountInfo: AccountInfo<Buffer>, context: Context) => {
 				const data = AccountLayout.decode(accountInfo.data);
 				console.log("address===>", data, address);

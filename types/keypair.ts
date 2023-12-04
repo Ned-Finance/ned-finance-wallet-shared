@@ -5,5 +5,3 @@ export type Keypair = SolanaKeypair;
 //   secretKey:Uint8Array,
 //   publicKey:  Uint8Array
 // };
-
-export type KeypairImpl = {};

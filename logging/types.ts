@@ -10,7 +10,7 @@ export type LogMessageBase = {
 export type LogAllowedValue = string | number | boolean;
 
 // These are lower case for compatibility with backend standards (i.e. python)
-export type LogScreenViewMessage = {} & LogMessageBase;
+export type LogScreenViewMessage = LogMessageBase;
 
 export type LogTapMessage = {
 	meta: {
@@ -19,10 +19,10 @@ export type LogTapMessage = {
 	} & LogMetaBase;
 } & LogMessageBase;
 
-export type LogSystemMessage = {} & LogMessageBase;
+export type LogSystemMessage = LogMessageBase;
 
 export type LogExceptionMessage = {
 	capturedError: Error;
 } & LogMessageBase;
 
-export type LogErrorMessage = {} & LogMessageBase;
+export type LogErrorMessage = LogMessageBase;

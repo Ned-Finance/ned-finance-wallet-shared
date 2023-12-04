@@ -6,7 +6,7 @@ import { Keypair } from "./keypair";
 
 export type BaseWallet = {
 	name: string;
-	privateKey: string; //base64
+	privateKey: string; // base64
 	address: string;
 	mnemonic: string;
 	selected: boolean;

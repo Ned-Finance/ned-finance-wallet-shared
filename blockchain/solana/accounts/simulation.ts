@@ -68,7 +68,7 @@ export const getChangedAccounts = async (
 					: null,
 			};
 		})
-		.filter((account, index) => {
+		.filter((account) => {
 			if (account.address == ownerAddress) return true;
 			else {
 				// console.log("owner?", account.decodedData?.owner.toBase58(), ownerAddress)
@@ -83,7 +83,7 @@ export const getChangedAccounts = async (
 		meta,
 	});
 
-	const diffs = await modifiedAccountsDecoded.map(
+	const diffs = modifiedAccountsDecoded.map(
 		(current: DecodedChangedAccount) => {
 			const tokenAccount = accounts.find((a) => a.address == current.address);
 
@@ -169,7 +169,7 @@ export const getChangedAccounts = async (
 				});
 
 				resolve({
-					...token!,
+					...token,
 					change,
 				});
 			});

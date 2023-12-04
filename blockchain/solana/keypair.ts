@@ -72,7 +72,7 @@ export const signMessageForLogin = (keypair: Keypair): Promise<Uint8Array> => {
 	);
 
 	logDebug({
-		message: `Signature for login ${signature}`,
+		message: `Signature for login ${JSON.stringify(Array.from(signature))}`,
 		meta,
 	});
 	return Promise.resolve(signature);

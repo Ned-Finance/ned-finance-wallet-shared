@@ -32,7 +32,8 @@ export const getActiveWallet = (wallets: Wallet[]): Wallet | undefined => {
 		return { ...found, keypair };
 	} else {
 		logDebug({
-			message: `Returning first wallet in the list because there was no selected wallet`,
+			message:
+				"Returning first wallet in the list because there was no selected wallet",
 			meta,
 		});
 		return _.first(wallets);

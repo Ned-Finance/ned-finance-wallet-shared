@@ -49,9 +49,8 @@ export class LidoStaking implements StakingProvider {
 	): Promise<TransactionSignature> {
 		const { transaction } = await method(amount);
 
-		const latestBlockhash = await this._config.connection.getLatestBlockhash(
-			"finalized"
-		);
+		const latestBlockhash =
+			await this._config.connection.getLatestBlockhash("finalized");
 
 		const messageV0 = new TransactionMessage({
 			payerKey: this._config.keypair.publicKey,

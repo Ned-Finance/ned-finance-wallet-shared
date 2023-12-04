@@ -41,10 +41,6 @@ import { subscribeToAccountUpdates, unsubscribeToAccountUpdates } from "../ws";
 
 const connection = getConnection();
 
-const meta = {
-	file: "utils/solana/accounts/helpers.ts",
-};
-
 export type SolanaTokenAccount = {
 	address: string;
 	mint: string;

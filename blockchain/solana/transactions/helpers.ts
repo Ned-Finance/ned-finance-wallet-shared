@@ -1,8 +1,3 @@
-// import {
-//     TokenInstructions,
-//   } from '@project-serum/serum';
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
 	TOKEN_PROGRAM_ID,
 	createTransferCheckedInstruction,
@@ -25,99 +20,6 @@ import _ from "lodash";
 import { ReadableParsedTransaction } from "ned-transactions-parser/dist/cjs/humanize/types";
 import { MEMO_PROGRAM_ID, NED_WALLET_API_URL } from "../../../constants";
 import { getConnection } from "../connection";
-
-// const INITIALIZE_ACCOUNT_ACCOUNT_INDEX = 0;
-// const INITIALIZE_ACCOUNT_MINT_INDEX = 1;
-// const INITIALIZE_ACCOUNT_OWNER_INDEX = 2;
-// const TRANSFER_SOURCE_INDEX = 0;
-// const TRANSFER_DESTINATION_INDEX = 1;
-// const TRANSFER_OWNER_INDEX = 2;
-// // const CLOSE_ACCOUNT_SOURCE_INDEX = 0;
-// // const CLOSE_ACCOUNT_DESTINATION_INDEX = 1;
-// // const CLOSE_ACCOUNT_OWNER_INDEX = 2;
-
-// export const getAccountByIndex = (accounts, accountKeys, accountIndex) => {
-//     const index = accounts.length > accountIndex && accounts[accountIndex];
-//     return accountKeys?.length > index && accountKeys[index];
-// };
-
-// export const getCloseAccountData = (publicKey, accounts, accountKeys) => {
-//     const sourcePubkey = getAccountByIndex(
-//         accounts,
-//         accountKeys,
-//         TRANSFER_SOURCE_INDEX,
-//     );
-
-//     const destinationPubkey = getAccountByIndex(
-//         accounts,
-//         accountKeys,
-//         TRANSFER_DESTINATION_INDEX,
-//     );
-
-//     const ownerPubkey = getAccountByIndex(
-//         accounts,
-//         accountKeys,
-//         TRANSFER_OWNER_INDEX,
-//     );
-
-//     if (!ownerPubkey || !publicKey.equals(ownerPubkey)) {
-//         return;
-//     }
-
-//     return { sourcePubkey, destinationPubkey, ownerPubkey };
-// };
-
-// export const getTransferData = (publicKey, accounts, accountKeys) => {
-//     const sourcePubkey = getAccountByIndex(
-//         accounts,
-//         accountKeys,
-//         TRANSFER_SOURCE_INDEX,
-//     );
-
-//     const destinationPubkey = getAccountByIndex(
-//         accounts,
-//         accountKeys,
-//         TRANSFER_DESTINATION_INDEX,
-//     );
-
-//     const ownerPubkey = getAccountByIndex(
-//         accounts,
-//         accountKeys,
-//         TRANSFER_OWNER_INDEX,
-//     );
-
-//     if (!ownerPubkey || !publicKey.equals(ownerPubkey)) {
-//         return;
-//     }
-
-//     return { sourcePubkey, destinationPubkey, ownerPubkey };
-// };
-
-// export const getInitializeAccountData = (publicKey, accounts, accountKeys) => {
-//     const accountPubkey = getAccountByIndex(
-//         accounts,
-//         accountKeys,
-//         INITIALIZE_ACCOUNT_ACCOUNT_INDEX,
-//     );
-
-//     const mintPubkey = getAccountByIndex(
-//         accounts,
-//         accountKeys,
-//         INITIALIZE_ACCOUNT_MINT_INDEX,
-//     );
-
-//     const ownerPubkey = getAccountByIndex(
-//         accounts,
-//         accountKeys,
-//         INITIALIZE_ACCOUNT_OWNER_INDEX,
-//     );
-
-//     if (!ownerPubkey || !publicKey.equals(ownerPubkey)) {
-//         return;
-//     }
-
-//     return { accountPubkey, mintPubkey, ownerPubkey };
-// };
 
 export const getTransferFee = async (message: VersionedMessage) => {
 	const connection = getConnection();
@@ -151,16 +53,6 @@ export const getSendTransaction = async ({
 	memoMessage,
 	tokenProgramId = TOKEN_PROGRAM_ID.toBase58(),
 }: SendTransactionParams) => {
-	// source: PublicKey,
-	// mint: PublicKey,
-	// destination: PublicKey,
-	// owner: PublicKey,
-	// amount: number | bigint,
-	// decimals: number,
-	// multiSigners: (Signer | PublicKey)[] = [],
-	// programId = TOKEN_PROGRAM_ID
-
-	// if (!tokenAddress) {
 	const transferInstruction = !tokenAddress
 		? [
 				SystemProgram.transfer({
@@ -213,9 +105,6 @@ export const getSendTransaction = async ({
 	transaction.sign([signer]);
 
 	return transaction;
-	// } else {
-
-	// }
 };
 
 export const getOrCreateTokenAccount = async (
@@ -246,11 +135,6 @@ export const getTokenAccount = async (tokenMint: string, address: string) => {
 
 	return tokenAccount;
 };
-
-// export const getMint = async (tokenAddress: string) => {
-// 	// const connection = getConnection();
-// 	return getMintAccount(tokenAddress);
-// };
 
 export const sendTransaction = async (transaction: VersionedTransaction) => {
 	const connection = getConnection();
@@ -314,16 +198,13 @@ export const getTransactionInstructions = async (
 		async (resolve, reject) => {
 			const instructionsUnflatted = await Promise.all(
 				transactionlist.map(async (transaction: VersionedTransaction) => {
-					const addressLookupTableAccounts = await getLookupTableAccounts(
-						transaction
-					);
+					const addressLookupTableAccounts =
+						await getLookupTableAccounts(transaction);
 					return TransactionMessage.decompile(transaction.message, {
 						addressLookupTableAccounts,
 					}).instructions;
 				})
 			);
-
-			console.log("instructionsUnflatted", instructionsUnflatted);
 
 			const instructionsFlattern = _.flatten(instructionsUnflatted);
 
@@ -356,9 +237,8 @@ export const mergeTransactions = async (
 
 	const instructions = await getTransactionInstructions(transactions);
 
-	const addressLookupTableAccounts = await getAddressLookupTableAccounts(
-		transactions
-	);
+	const addressLookupTableAccounts =
+		await getAddressLookupTableAccounts(transactions);
 
 	const latestBlockhash = await getConnection().getLatestBlockhash();
 
@@ -368,12 +248,6 @@ export const mergeTransactions = async (
 		instructions: instructions,
 	}).compileToV0Message(addressLookupTableAccounts);
 	const transaction = new VersionedTransaction(messageV0);
-
-	// message.instructions.push(...instructions);
-
-	// mainTransaction.message = message.compileToV0Message(
-	//     addressLookupTableAccounts
-	// );
 
 	return transaction;
 };
@@ -403,15 +277,17 @@ export const loadParsedTransactions = async (
 
 export const saveTransactionToDisk = async (
 	txId: string,
-	tx: ReadableParsedTransaction
+	tx: ReadableParsedTransaction,
+	saveFn: (key: string, value: string) => Promise<void>
 ) => {
-	return await AsyncStorage.setItem(`${txId}`, JSON.stringify(tx))
-		.then((x) => `Transaction ${txId} stored locally`)
-		.catch((x) => `Error storing transaction ${txId} locally`);
+	return await saveFn(`${txId}`, JSON.stringify(tx));
 };
 
-export const getTransactionFromDisk = async (txId: string) => {
-	return await AsyncStorage.getItem(`${txId}`)
+export const getTransactionFromDisk = async (
+	txId: string,
+	getFn: (key: string) => Promise<string | null>
+) => {
+	return await getFn(`${txId}`)
 		.then((tx: string | null) => {
 			if (tx) {
 				return JSON.parse(tx);
@@ -424,12 +300,14 @@ export const getTransactionFromDisk = async (txId: string) => {
 
 export const loadParsedTransactionsOptimized = async (
 	walletAddress: string,
-	txIds: string[]
+	txIds: string[],
+	getFn: (key: string) => Promise<string | null>,
+	saveFn: (key: string, value: string) => Promise<void>
 ) => {
 	const promises = _.chunk(txIds, 1).map((txIdChunk) => {
 		return new Promise(async (resolve, _) => {
 			const txFromDisk = await Promise.all(
-				txIdChunk.map((txId) => getTransactionFromDisk(txId))
+				txIdChunk.map((txId) => getTransactionFromDisk(txId, getFn))
 			);
 
 			console.log("txFromDisk", txFromDisk);
@@ -444,7 +322,7 @@ export const loadParsedTransactionsOptimized = async (
 						const loadedTxs = await loadTxPerTxId(walletAddress, [txToSend]);
 						await Promise.all(
 							loadedTxs.map((tx: ReadableParsedTransaction) =>
-								saveTransactionToDisk(txToSend, tx)
+								saveTransactionToDisk(txToSend, tx, saveFn)
 							)
 						);
 						return loadedTxs;

@@ -153,7 +153,7 @@ export class VaultsManager {
 			return false;
 		}
 		this._anchorProgram = new Program(
-			this._idl!,
+			this._idl,
 			this._programId,
 			this._provider
 		);
@@ -168,30 +168,10 @@ export class VaultsManager {
 
 	getSpareObject(spare: number) {
 		return match(spare)
-			.when(
-				(value) => value == 0,
-				(value) => {
-					return { none: {} };
-				}
-			)
-			.when(
-				(value) => value == 1,
-				(value) => {
-					return { spare: {} };
-				}
-			)
-			.when(
-				(value) => value == 2,
-				(value) => {
-					return { spare2X: {} };
-				}
-			)
-			.when(
-				(value) => value == 3,
-				(value) => {
-					return { spare3X: {} };
-				}
-			)
+			.with(0, () => ({ none: {} }))
+			.with(1, () => ({ spare: {} }))
+			.with(2, () => ({ spare2X: {} }))
+			.with(3, () => ({ spare3X: {} }))
 			.run();
 	}
 
@@ -822,9 +802,8 @@ export class VaultsManager {
 
 		const fundTx = await this.fundWithDiffBalanceTx(vault, userTokenAccount);
 
-		const provideLiquidityTx = await this.provideLiquidityWithDiffBalanceTx(
-			vault
-		);
+		const provideLiquidityTx =
+			await this.provideLiquidityWithDiffBalanceTx(vault);
 
 		console.log("provideLiquidityTx", provideLiquidityTx);
 
@@ -1359,9 +1338,8 @@ export class VaultsManager {
 	}
 
 	async getTokenAPY(tokenAddress: string) {
-		const meteoraVaultInfo = await this._meteoraManager.getMeteoraVaultInfo(
-			tokenAddress
-		);
+		const meteoraVaultInfo =
+			await this._meteoraManager.getMeteoraVaultInfo(tokenAddress);
 		return meteoraVaultInfo?.average_apy;
 	}
 

@@ -4,6 +4,15 @@ import crashlytics from "@react-native-firebase/crashlytics";
 import * as Sentry from "@sentry/react-native";
 import { captureException } from "@sentry/react-native";
 import { LOG_EXCEPTION, LOG_SCREEN_VIEW } from "../constants";
+
+type FirebaseMessage = {
+	message: string;
+	eventName: string;
+	meta: {
+		capturedError?: Error;
+	};
+};
+
 //
 // Inherit from `winston-transport` so you can take advantage
 // of the base functionality and `.exceptions.handle()`.
@@ -19,12 +28,12 @@ export class FirebaseTransport extends TransportStream {
 		//
 	}
 
-	async log(info: any, callback: () => void) {
+	async log(info: FirebaseMessage, callback: () => void) {
 		setImmediate(() => {
 			this.emit("logged", info);
 		});
 
-		const { message, eventName, meta = {} } = info;
+		const { message, eventName, meta = { capturedError: null } } = info;
 
 		if (eventName) {
 			switch (eventName) {
@@ -40,17 +49,16 @@ export class FirebaseTransport extends TransportStream {
 						screen_name: "ProductScreen",
 					});
 
-					// await analytics().logEvent(eventName, { ...meta, message });
 					break;
 				}
 				case LOG_EXCEPTION: {
-					if (meta.thrownError) {
-						captureException(meta.thrownError); //Delete when removing Sentry
-						await crashlytics().recordError(meta.thrownError);
-						await Sentry.captureException(meta.thrownError); // TODO: remove this
+					if (meta.capturedError) {
+						captureException(meta.capturedError); // Delete when removing Sentry
+						await crashlytics().recordError(meta.capturedError);
+						await Sentry.captureException(meta.capturedError); // TODO: remove this
 					}
 					const metaWithoutError = { ...meta };
-					delete metaWithoutError.thrownError;
+					delete metaWithoutError.capturedError;
 					await analytics().logEvent(eventName, {
 						...metaWithoutError,
 						message,
