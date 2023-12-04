@@ -1369,6 +1369,8 @@ export class VaultsManager {
 	async getTransactions(
 		vault: Vault,
 		walletAddress: string,
+		getFn: (key: string) => Promise<string | null>,
+		saveFn: (key: string, value: string) => Promise<void>,
 		latestSignature?: string
 	): Promise<{
 		transactions: VaultTransaction[];
@@ -1392,7 +1394,8 @@ export class VaultsManager {
 		const transactions = await getTransactionsForAddress(
 			vault.accountAddress,
 			walletAddress,
-			tokens,
+			getFn,
+			saveFn,
 			latestSignature
 		);
 

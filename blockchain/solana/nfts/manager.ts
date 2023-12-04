@@ -522,6 +522,8 @@ export class NftManager {
 
 			return await getSendTransaction({
 				fromAddress: fromATAAddress,
+				mint: nft.address,
+				decimals: 1,
 				signer: from,
 				toAddress: toATAAddress,
 				amount: 1,

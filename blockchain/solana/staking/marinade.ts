@@ -19,7 +19,6 @@ import {
 } from ".";
 import { round2Decimals } from "../../../numbers";
 import { getATAForAddress } from "../accounts";
-import { getTransactionsForAddress } from "../transactions";
 import { sendTransaction } from "../transactions/helpers";
 
 type MarinadeInitConfig = Readonly<StakingConfig & Partial<MarinadeConfig>>;
@@ -82,14 +81,14 @@ export class MarinadeStaking implements StakingProvider {
 			this._config.keypair.publicKey.toBase58()
 		);
 
-		const { transactions, latestSignature } = await getTransactionsForAddress(
-			ata,
-			this._config.publicKey!.toBase58(),
-			[]
-		);
+		// const { transactions, latestSignature } = await getTransactionsForAddress(
+		// 	ata,
+		// 	this._config.publicKey!.toBase58(),
+		// 	[]
+		// );
 
-		console.log("latestSignature ==>", latestSignature);
-		console.log("transactions ==>", transactions.length);
+		// console.log("latestSignature ==>", latestSignature);
+		// console.log("transactions ==>", transactions.length);
 
 		// const transactions =
 		// console.log('signatures', signatures, signatures.length)

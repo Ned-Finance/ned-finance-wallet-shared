@@ -1,5 +1,6 @@
 import { PublicKey } from "@metaplex-foundation/js";
 import {
+	AccountMeta,
 	AddressLookupTableAccount,
 	Connection,
 	Keypair,
@@ -76,6 +77,11 @@ const meta = {
 	file: "utils/solana/jupiter/index.ts",
 };
 
+type IndexedRouteMap = {
+	mintKeys: string[];
+	indexedRouteMap: { [key: string]: number[] };
+};
+
 export class JupiterManager {
 	private static instance: JupiterManager;
 
@@ -119,17 +125,18 @@ export class JupiterManager {
 	}
 
 	public async loadRoutes(): Promise<{ [x: string]: string[] }> {
-		const indexedRouteMap = await (
+		const indexedRouteMap: IndexedRouteMap = (await (
 			await fetch(`${solana.JUPITER_API_URL}/indexed-route-map`)
-		).json();
+		).json()) as IndexedRouteMap;
 		const getMint = (index: number) =>
 			indexedRouteMap["mintKeys"][index] as string;
 
 		return _.transform(
 			indexedRouteMap["indexedRouteMap"],
-			(acc: { [x: string]: string }, value: number[], key: number) => {
-				const mint = getMint(key);
-				acc[mint.toString()] = indexedRouteMap["indexedRouteMap"][key].map(
+			(acc: { [x: string]: string[] }, value: number[], key: string) => {
+				const mint = getMint(parseInt(key));
+				const newKey = mint.toString();
+				acc[newKey] = indexedRouteMap["indexedRouteMap"][key].map(
 					(index: number) => getMint(index)
 				);
 				return acc;
@@ -274,7 +281,7 @@ export class JupiterManager {
 
 			const swapInstruction = new TransactionInstruction({
 				programId: new PublicKey(swapInstructionPayload.programId),
-				keys: swapInstructionPayload.accounts.map((key) => ({
+				keys: swapInstructionPayload.accounts.map((key: AccountMeta) => ({
 					pubkey: new PublicKey(key.pubkey),
 					isSigner: key.isSigner,
 					isWritable: key.isWritable,

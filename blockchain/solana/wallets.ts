@@ -21,6 +21,7 @@ import {
 import _ from "lodash";
 import { HDKey } from "micro-ed25519-hdkey";
 import { Observable } from "rxjs";
+import tweetnacl from "tweetnacl";
 import { ImportedWalletSolana, WalletFromMnemonic } from "../../wallet";
 import { getConnection } from "./connection";
 import { privateKeyToString } from "./keypair";
@@ -144,13 +145,45 @@ export class Wallet {
 		this.payer = payer;
 	}
 
-	async signTransaction(tx: Transaction) {
-		tx.partialSign(this.payer);
+	signVersioned(tx: VersionedTransaction) {
+		const serialized = tx.message.serialize();
+		const nedSignature = tweetnacl.sign.detached(
+			Uint8Array.from(serialized),
+			this.payer.secretKey
+		);
+		tx.addSignature(this.payer.publicKey, nedSignature);
 		return tx;
 	}
-	async signAllTransactions(txs: Transaction[]) {
-		return txs.map((t: Transaction) => {
-			t.partialSign(this.payer);
+
+	async signTransaction<T extends Transaction | VersionedTransaction>(
+		tx: T
+	): Promise<T> {
+		if (tx instanceof Transaction) {
+			tx.partialSign(this.payer);
+		} else {
+			const serialized = tx.message.serialize();
+			const nedSignature = tweetnacl.sign.detached(
+				Uint8Array.from(serialized),
+				this.payer.secretKey
+			);
+			tx.addSignature(this.payer.publicKey, nedSignature);
+		}
+		return tx;
+	}
+	async signAllTransactions<T extends Transaction | VersionedTransaction>(
+		txs: T[]
+	): Promise<T[]> {
+		return txs.map((t: T) => {
+			if (t instanceof Transaction) {
+				t.partialSign(this.payer);
+			} else {
+				const serialized = t.message.serialize();
+				const nedSignature = tweetnacl.sign.detached(
+					Uint8Array.from(serialized),
+					this.payer.secretKey
+				);
+				t.addSignature(this.payer.publicKey, nedSignature);
+			}
 			return t;
 		});
 	}

@@ -1,7 +1,6 @@
 import { camelCase, isArray, isObject, transform } from "lodash";
 
 const FLAG_TYPED_ARRAY = "FLAG_TYPED_ARRAY";
-var context = typeof window === "undefined" ? global : window;
 
 export const JSONEncode = (object: any) =>
 	JSON.stringify(object, (key: any, value: any) => {
@@ -24,7 +23,7 @@ export const JSONDecode = (str: string) =>
 		try {
 			if ("flag" in value && value.flag === FLAG_TYPED_ARRAY) {
 				// if found, we convert it back to a typed array
-				return new context[value.constructor](value.data);
+				return new Uint8Array(value.data);
 			}
 		} catch (e) {}
 

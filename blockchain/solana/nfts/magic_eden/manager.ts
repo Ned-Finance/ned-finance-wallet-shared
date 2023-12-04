@@ -84,11 +84,9 @@ export class MagicEdenManager {
 			]);
 
 			return {
-				magicEden: {
-					uniqueHolders: responseHolderStats.data.uniqueHolders,
-					totalSupply: responseHolderStats.data.totalSupply,
-					floorPrice: responseStats.data.floorPrice / Math.pow(10, 9),
-				},
+				uniqueHolders: responseHolderStats.data.uniqueHolders,
+				totalSupply: responseHolderStats.data.totalSupply,
+				floorPrice: responseStats.data.floorPrice / Math.pow(10, 9),
 			};
 		} catch (err) {
 			console.log("??", err);
@@ -240,7 +238,6 @@ export class MagicEdenManager {
 			symbol: nft.symbol,
 			uri: nft.uri,
 			listed: true,
-			compressed: false,
 			collection: collection ? collection.address.toBase58() : undefined,
 			updateAuthority: nft.updateAuthorityAddress.toBase58(),
 		};

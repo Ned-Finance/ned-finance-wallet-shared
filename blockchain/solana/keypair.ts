@@ -1,5 +1,4 @@
 import * as bip39 from "@medardm/react-native-bip39";
-import * as ed from "@noble/ed25519";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import { decodeUTF8 } from "tweetnacl-util";
@@ -23,15 +22,16 @@ export const privateKeyFromString = (privateKeyStr: string): Uint8Array => {
 };
 
 export const keyPairFromPrivateKey = (secretKey: Uint8Array): Keypair => {
-	const publicKey = secretKey.slice(32, 64);
-	const privateScalar = secretKey.slice(0, 32);
-	const computedPublicKey = ed.getPublicKey(privateScalar);
-	for (let ii = 0; ii < 32; ii++) {
-		if (publicKey[ii] !== computedPublicKey[ii]) {
-			throw new Error("provided secretKey is invalid");
-		}
-	}
-	return new Keypair({ publicKey, secretKey });
+	// const publicKey = secretKey.slice(32, 64);
+	// const privateScalar = secretKey.slice(0, 32);
+	// const computedPublicKey = ed.getPublicKeySync(privateScalar);
+	// for (let ii = 0; ii < 32; ii++) {
+	// 	if (publicKey[ii] !== computedPublicKey[ii]) {
+	// 		throw new Error("provided secretKey is invalid");
+	// 	}
+	// }
+	// return new Keypair({ publicKey, secretKey });
+	return Keypair.fromSecretKey(secretKey);
 };
 
 export const keypairFromPrivateKeyString = (
@@ -46,15 +46,16 @@ export const getPublicKeyFromAddress = (address: string): PublicKey => {
 };
 
 export const generateKeypair = (): Keypair => {
-	const privateScalar = ed.utils.randomPrivateKey();
-	const publicKey = ed.getPublicKey(privateScalar);
-	const secretKey = new Uint8Array(64);
-	secretKey.set(privateScalar);
-	secretKey.set(publicKey, 32);
-	return new Keypair({
-		publicKey,
-		secretKey,
-	});
+	// const privateScalar = ed.utils.randomPrivateKey();
+	// const publicKey = ed.getPublicKey(privateScalar);
+	// const secretKey = new Uint8Array(64);
+	// secretKey.set(privateScalar);
+	// secretKey.set(publicKey, 32);
+	// return new Keypair({
+	// 	publicKey,
+	// 	secretKey,
+	// });
+	return Keypair.generate();
 };
 
 // export const getKeypair = (wallet: Wallet) => {

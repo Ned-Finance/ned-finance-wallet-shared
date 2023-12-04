@@ -3,10 +3,10 @@ import {
 	encodeURL as encodeURLSolanaPay,
 	parseURL as parseURLSolanaPay,
 } from "@solana/pay";
-import { ParsedQR } from "../../../utils/camera/types";
 
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
+import { ParsedQR } from "./types";
 
 export const encodeURL = (
 	recipient: string,

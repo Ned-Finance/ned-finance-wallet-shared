@@ -70,7 +70,7 @@ logger.add(
 		host: "logs.collector.solarwinds.com",
 		path: "/v1/log",
 		auth: {
-			username: new String(""),
+			username: new String("") as string,
 			password: "OOXx9paNb3tIuegQfplQpVLCUR8W",
 		},
 		level: "info",

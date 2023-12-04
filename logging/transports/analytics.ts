@@ -1,8 +1,8 @@
-import TransportStream = require("winston-transport");
 import analytics from "@react-native-firebase/analytics";
 import crashlytics from "@react-native-firebase/crashlytics";
 import * as Sentry from "@sentry/react-native";
 import { captureException } from "@sentry/react-native";
+import TransportStream from "winston-transport";
 import { LOG_EXCEPTION, LOG_SCREEN_VIEW } from "../constants";
 
 type FirebaseMessage = {
@@ -17,6 +17,7 @@ type FirebaseMessage = {
 // Inherit from `winston-transport` so you can take advantage
 // of the base functionality and `.exceptions.handle()`.
 //
+
 export class FirebaseTransport extends TransportStream {
 	constructor(opts: TransportStream.TransportStreamOptions = {}) {
 		super(opts);
