@@ -27,7 +27,7 @@
 		"@sentry/react-native": "^5.14.1",
 		"@solana/pay": "^0.2.5",
 		"@solana/spl-account-compression": "^0.2.0",
-		"@solana/spl-token": "^0.3.6",
+		"@solana/spl-token": "^0.4.13",
 		"@solana/spl-token-registry": "^0.2.229",
 		"@solana/wallet-adapter-base": "^0.9.23",
 		"@solana/wallet-standard-util": "^1.1.0",
