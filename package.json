@@ -31,7 +31,7 @@
 		"@solana/spl-token-registry": "^0.2.229",
 		"@solana/wallet-adapter-base": "^0.9.23",
 		"@solana/wallet-standard-util": "^1.1.0",
-		"@solana/web3.js": "^1.87.6",
+		"@solana/web3.js": "^1.98.4",
 		"@symmetry-hq/funds-sdk": "^0.1.63",
 		"@tradle/react-native-http": "^2.0.1",
 		"asyncstorage-down": "^4.2.0",
