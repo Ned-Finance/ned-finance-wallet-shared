@@ -52,7 +52,7 @@
 		"rxjs": "^7.8.1",
 		"short-uuid": "^4.2.2",
 		"stream-browserify": "^1.0.0",
-		"ts-pattern": "^5.0.1",
+		"ts-pattern": "^5.8.0",
 		"tweetnacl": "^1.0.3",
 		"tweetnacl-util": "^0.15.1",
 		"url": "^0.10.3",
