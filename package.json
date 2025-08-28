@@ -32,7 +32,7 @@
 		"@solana/wallet-adapter-base": "^0.9.23",
 		"@solana/wallet-standard-util": "^1.1.0",
 		"@solana/web3.js": "^1.87.6",
-		"@symmetry-hq/funds-sdk": "^0.1.63",
+		"@symmetry-hq/funds-sdk": "^0.1.80",
 		"@tradle/react-native-http": "^2.0.1",
 		"asyncstorage-down": "^4.2.0",
 		"axios": "^0.26.1",
