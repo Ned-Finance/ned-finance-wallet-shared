@@ -44,7 +44,7 @@
 		"lodash": "^4.17.21",
 		"micro-ed25519-hdkey": "^0.1.2",
 		"ned-transactions-parser": "Ned-Finance/ned-transaction-parser",
-		"patch-package": "^6.5.1",
+		"patch-package": "^8.0.1",
 		"react-native-level-fs": "^3.0.1",
 		"react-native-os": "^1.2.6",
 		"react-native-randombytes": "^3.6.1",
